@@ -99,7 +99,7 @@ def comment_webhook():
     game = game_info(game_name)
     if game is not None:
       games_texts.append(game_text(game))
-  reply_text = '\n'.join(games_texts)
+  reply_text = '\n\n'.join(games_texts)
   if reply_text != '' and post_id == 47384:
     send_a_comment(post_id = post_id, comment_id = comment_id, reply_text = reply_text)
   return('OK')

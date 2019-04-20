@@ -1,0 +1,114 @@
+{
+  "message": "",
+  "result": {
+    "id": 1901100,
+    "author": {
+      "id": 128204,
+      "name": "RAWG",
+      "avatar_url": "https://leonardo.osnova.io/a1bdc4e1-2737-be62-057e-cb15a24cbf30/",
+      "type": 3
+    },
+    "date": 1555697227,
+    "dateRFC": "Fri, 19 Apr 2019 21:07:07 +0300",
+    "isFavorited": false,
+    "isEdited": false,
+    "likes": {
+      "is_liked": 0,
+      "count": 0,
+      "summ": 0
+    },
+    "media": [],
+    "level": 1,
+    "is_pinned": false,
+    "is_ignored": false,
+    "is_removed": false,
+    "replyTo": 1898514,
+    "text": "api comment",
+    "html": "<p>api comment</p>",
+    "attaches": [],
+    "source_id": 4,
+    "entry": {
+      "id": 47384,
+      "author": {
+        "id": 128210,
+        "name": "samat galimov",
+        "avatar_url": "https://leonardo.osnova.io/035529d6-2557-2f14-340c-739480974683/"
+      },
+      "badges": [
+        {
+          "type": "top",
+          "text": "Трасса 60",
+          "background": "#ffffff",
+          "color": "#717173",
+          "border": "#ffffff"
+        }
+      ],
+      "commentsCount": 4,
+      "commentsSeenCount": null,
+      "favoritesCount": 0,
+      "cover": null,
+      "date": 1555673489,
+      "dateRFC": "Fri, 19 Apr 2019 14:31:29 +0300",
+      "last_modification_date": 1555673489,
+      "hitsCount": 22,
+      "intro": "Тестовый текст RAWG",
+      "introInFeed": null,
+      "isEnabledComments": true,
+      "isEnabledLikes": true,
+      "isFavorited": false,
+      "likes": {
+        "is_liked": 0,
+        "count": 0,
+        "summ": 0,
+        "is_hidden": false
+      },
+      "subsite": {
+        "id": 130721,
+        "url": "https://dtf.ru/apitest",
+        "type": 2,
+        "name": "Трасса 60",
+        "description": "Тестируем тут ботов",
+        "avatar_url": "https://leonardo.osnova.io/f9abebef-520f-e5d9-9b70-01c78353f76e/",
+        "head_cover": null
+      },
+      "similar": [],
+      "title": "Тестовый пост для RAWG",
+      "type": 1,
+      "coverBlocks": [
+        {
+          "type": "text",
+          "data": {
+            "text": "<p>Тестовый текст RAWG</p>",
+            "text_truncated": "<<<same>>>"
+          },
+          "cover": true,
+          "anchor": ""
+        }
+      ],
+      "entryContent": null,
+      "commentatorsAvatars": [
+        "https://leonardo.osnova.io/4836f44f-698c-9eb9-a4b7-2498d621239d/",
+        "https://leonardo.osnova.io/6bd2b280-5f68-5a57-63a1-fd80f62caf07/",
+        "https://leonardo.osnova.io/59d6b7d6-6df1-05f5-d61b-cfedaa078b9a/",
+        "https://leonardo.osnova.io/622e55d6-0f1e-f32a-b9cb-d6b671125b49/",
+        "https://leonardo.osnova.io/955c1390-9225-a50c-7af7-67a3ec9e3e00/",
+        "https://leonardo.osnova.io/1738df25-a2f0-714a-b8d5-61773107b5a2/",
+        "https://leonardo.osnova.io/4e663d24-403d-01c6-17b7-20e98bf9bb33/",
+        "https://leonardo.osnova.io/74417fde-1e5b-6a47-8809-6d19b03c9b62/",
+        "https://leonardo.osnova.io/e0e3ec9d-5d8b-fe58-f17e-f674eda2ab19/",
+        "https://leonardo.osnova.io/3b61c54b-085c-4aec-259c-d6ca00f3282a/",
+        "https://leonardo.osnova.io/923234f7-b5fa-67b4-991c-f73db56cfaea/"
+      ],
+      "webviewUrl": null,
+      "isPinned": false,
+      "isEditorial": false,
+      "audioUrl": null,
+      "hotness": 0
+    },
+    "load_more": {
+      "count": 0,
+      "ids": [],
+      "avatars": []
+    }
+  }
+}

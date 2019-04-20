@@ -1,0 +1,38 @@
+{
+  "type": "new_comment",
+  "data": {
+    "id": 1901063,
+    "url": "https://dtf.ru/apitest/47384-testovyy-post-dlya-rawg?comment=1901063",
+    "text": "ответ на твой ответ",
+    "media": [],
+    "creator": {
+      "id": 128210,
+      "avatar": "https://leonardo.osnova.io/035529d6-2557-2f14-340c-739480974683/",
+      "name": "samat galimov",
+      "url": "https://dtf.ru/u/128210-samat-galimov"
+    },
+    "content": {
+      "id": 47384,
+      "title": "Тестовый пост для RAWG",
+      "url": "https://dtf.ru/apitest/47384-testovyy-post-dlya-rawg",
+      "owner": {
+        "id": 130721,
+        "name": "Трасса 60",
+        "avatar": "https://leonardo.osnova.io/f9abebef-520f-e5d9-9b70-01c78353f76e/",
+        "url": "https://dtf.ru/apitest"
+      }
+    },
+    "reply_to": {
+      "id": 1901057,
+      "url": "https://dtf.ru/apitest/47384-testovyy-post-dlya-rawg?comment=1901057",
+      "text": "ответ на комментарий",
+      "media": [],
+      "creator": {
+        "id": 128210,
+        "avatar": "https://leonardo.osnova.io/035529d6-2557-2f14-340c-739480974683/",
+        "name": "samat galimov",
+        "url": "https://dtf.ru/u/128210-samat-galimov"
+      }
+    }
+  }
+}

@@ -9,6 +9,7 @@ import rawgpy
 from fuzzywuzzy import fuzz
 import requests
 import os
+import datetime
 
 app = Flask(__name__)
 
@@ -62,19 +63,28 @@ def game_info(name):
     return None
 
 def game_text(game):
-  pubs = []
-  for pub in game.publishers:
-    pubs.append(f'[{pub.name}](https://rawg.io/publishers/{pub.slug})')
-  publishers_text = ', '.join(pubs)
   text = f'''[{game.name}](https://rawg.io/games/{game.slug})
-Дата релиза: {game.released}
-Метакритикс: [{game.metacritic}]({game.metacritic_url})
-Издатель: {publishers_text}'''
-  stores = []
-  for store in game.stores:
-    stores.append(f'[{store.name}]({store.url})')
-  stores_text = ' • '.join(stores)
-  text = '\n'.join([text, stores_text])
+Дата релиза: {datetime.date.fromisoformat(game.released).strftime("%d.%m.%Y")}'''
+  if game.metacritic > 0:
+    text = text + f'\nРейтинг Metacritic: [{game.metacritic}]({game.metacritic_url})'
+  if len(game.developers) > 0:
+    devs = []
+    for dev in game.developers:
+      devs.append(f'[{dev.name}](https://rawg.io/developers/{dev.slug})')
+    developers_text = ', '.join(devs)
+    text = text + f'\nРазработчик{ "и" if len(devs)>1 else ""}: {developers_text}'
+  if len(game.publishers) > 0:
+    pubs = []
+    for pub in game.publishers:
+      pubs.append(f'[{pub.name}](https://rawg.io/publishers/{pub.slug})')
+    publishers_text = ', '.join(pubs)
+    text = text + f'\nИздател{ "и" if len(pubs)>1 else "ь"}: {publishers_text}'
+  if len(game.stores) > 0:
+    stores = []
+    for store in game.stores:
+      stores.append(f'[{store.name}]({store.url})')
+    stores_text = ' • '.join(stores)
+    text = '\n'.join([text, stores_text])
   return text
 
 
@@ -99,8 +109,8 @@ def comment_webhook():
     game = game_info(game_name)
     if game is not None:
       games_texts.append(game_text(game))
-  reply_text = '\n\n'.join(games_texts)
-  if reply_text != '' and post_id == 47384:
+  reply_text = 'Кажется, вы искали эти игры.\n\n' + '\n\n'.join(games_texts)
+  if len(games_texts) > 0 and post_id == 47384:
     send_a_comment(post_id = post_id, comment_id = comment_id, reply_text = reply_text)
   return('OK')
   # TODO: save a reply to a database along with a timestamp for further analytics needs

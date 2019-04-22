@@ -10,11 +10,23 @@ from fuzzywuzzy import fuzz
 import requests
 import os
 import datetime
+import concurrent.futures
+import sqlite3
+
 
 app = Flask(__name__)
 
 X_DEVICE_TOKEN = os.environ['X_DEVICE_TOKEN']
 X_DEVICE_POSSESSION_TOKEN = os.environ['X_DEVICE_POSSESSION_TOKEN']
+
+conn = None
+c = None
+def init():
+  global conn
+  global c
+  conn = sqlite3.connect('logs.sqlite')
+  c = conn.cursor()
+executor = concurrent.futures.ProcessPoolExecutor(initializer=init)
 
 def send_a_comment(post_id, comment_id, reply_text):
   try:
@@ -31,7 +43,7 @@ def send_a_comment(post_id, comment_id, reply_text):
               "text": reply_text,
           },
       )
-      return response
+      return (response.json()['result']['id'], response.json()['result']['text'])
       print('Response HTTP Status Code: {status_code}'.format(
           status_code=response.status_code))
       print('Response HTTP Response Body: {content}'.format(
@@ -87,10 +99,7 @@ def game_text(game):
     text = '\n'.join([text, stores_text])
   return text
 
-
-@app.route("/comment_webhook", methods=['POST'])
-def comment_webhook():
-  payload = request.get_json()
+def deal_with_comment(payload):
   # TODO: save payload to a database along with a timestamp for further analytics needs
   if payload['type'] != 'new_comment':
     raise Exception(f'unexpected webhook payload type = {data["type"]}, expected new_comment')
@@ -109,8 +118,20 @@ def comment_webhook():
     game = game_info(game_name)
     if game is not None:
       games_texts.append(game_text(game))
-  reply_text = 'Кажется, вы искали эти игры.\n\n' + '\n\n'.join(games_texts)
+  (reply_id, reply_text) = (None, None)
   if len(games_texts) > 0 and post_id == 47384:
-    send_a_comment(post_id = post_id, comment_id = comment_id, reply_text = reply_text)
+    reply_text = 'Кажется, вы искали эти игры.\n\n' + '\n\n'.join(games_texts)
+    (reply_id, reply_text) = send_a_comment(post_id = post_id, comment_id = comment_id, reply_text = reply_text)
+  try:
+    c.execute('insert into received (created_at, post_id, comment_id, comment_text, comment_author, games_names, payload, reply_id, reply_text) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', (datetime.datetime.now(), post_id, comment_id, comment_text, comment_author, '❧'.join(games_names), json.dumps(payload), reply_id, reply_text))
+    conn.commit()
+  except Exception as e:
+    print(e)
   return('OK')
   # TODO: save a reply to a database along with a timestamp for further analytics needs
+
+@app.route("/comment_webhook", methods=['POST'])
+def comment_webhook():
+  payload = request.get_json()
+  executor.submit(deal_with_comment, payload)
+  return('OK')

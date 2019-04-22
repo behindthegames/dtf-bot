@@ -100,35 +100,33 @@ def game_text(game):
   return text
 
 def deal_with_comment(payload):
-  # TODO: save payload to a database along with a timestamp for further analytics needs
-  if payload['type'] != 'new_comment':
-    raise Exception(f'unexpected webhook payload type = {data["type"]}, expected new_comment')
-  post_id = payload['data']['content']['id']
-  comment_id = payload['data']['id']
-  comment_text = payload['data']['text']
-  comment_author = payload['data']['creator']['id']
-  if comment_author == 128204:
-    return('OK')
-  if post_id == 47384:
-    print(f'payload: {payload}')
-  games_texts = []
-  games_names = get_game_names_from_text(comment_text)
-  print(f'games_names: {games_names}')
-  for game_name in games_names:
-    game = game_info(game_name)
-    if game is not None:
-      games_texts.append(game_text(game))
-  (reply_id, reply_text) = (None, None)
-  if len(games_texts) > 0 and post_id == 47384:
-    reply_text = 'Кажется, вы искали эти игры.\n\n' + '\n\n'.join(games_texts)
-    (reply_id, reply_text) = send_a_comment(post_id = post_id, comment_id = comment_id, reply_text = reply_text)
   try:
+    if payload['type'] != 'new_comment':
+      raise Exception(f'unexpected webhook payload type = {data["type"]}, expected new_comment')
+    post_id = payload['data']['content']['id']
+    comment_id = payload['data']['id']
+    comment_text = payload['data']['text']
+    comment_author = payload['data']['creator']['id']
+    if comment_author == 128204:
+      return('OK')
+    if post_id == 47384:
+      print(f'payload: {payload}')
+    games_texts = []
+    games_names = get_game_names_from_text(comment_text)
+    print(f'games_names: {games_names}')
+    for game_name in games_names:
+      game = game_info(game_name)
+      if game is not None:
+        games_texts.append(game_text(game))
+    (reply_id, reply_text) = (None, None)
+    if len(games_texts) > 0 and post_id == 47384:
+      reply_text = 'Кажется, вы искали эти игры.\n\n' + '\n\n'.join(games_texts)
+      (reply_id, reply_text) = send_a_comment(post_id = post_id, comment_id = comment_id, reply_text = reply_text)
     c.execute('insert into received (created_at, post_id, comment_id, comment_text, comment_author, games_names, payload, reply_id, reply_text) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', (datetime.datetime.now(), post_id, comment_id, comment_text, comment_author, '❧'.join(games_names), json.dumps(payload), reply_id, reply_text))
     conn.commit()
   except Exception as e:
     print(e)
   return('OK')
-  # TODO: save a reply to a database along with a timestamp for further analytics needs
 
 @app.route("/comment_webhook", methods=['POST'])
 def comment_webhook():

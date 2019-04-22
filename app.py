@@ -82,13 +82,13 @@ def game_text(game):
   if len(game.developers) > 0:
     devs = []
     for dev in game.developers:
-      devs.append(f'[{dev.name}](https://rawg.io/developers/{dev.slug})')
+      devs.append(f'{dev.name}')
     developers_text = ', '.join(devs)
     text = text + f'\nРазработчик{ "и" if len(devs)>1 else ""}: {developers_text}'
   if len(game.publishers) > 0:
     pubs = []
     for pub in game.publishers:
-      pubs.append(f'[{pub.name}](https://rawg.io/publishers/{pub.slug})')
+      pubs.append(f'{pub.name}')
     publishers_text = ', '.join(pubs)
     text = text + f'\nИздател{ "и" if len(pubs)>1 else "ь"}: {publishers_text}'
   if len(game.stores) > 0:

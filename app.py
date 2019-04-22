@@ -13,7 +13,6 @@ import datetime
 import concurrent.futures
 import sqlite3
 
-
 app = Flask(__name__)
 
 X_DEVICE_TOKEN = os.environ['X_DEVICE_TOKEN']
@@ -114,10 +113,13 @@ def deal_with_comment(payload):
     games_texts = []
     games_names = get_game_names_from_text(comment_text)
     print(f'games_names: {games_names}')
+    slugs = set()
     for game_name in games_names:
       game = game_info(game_name)
       if game is not None:
-        games_texts.append(game_text(game))
+        if game.slug not in slugs:
+          games_texts.append(game_text(game))
+          slugs.add(game.slug)
     (reply_id, reply_text) = (None, None)
     if len(games_texts) > 0 and post_id == 47384:
       reply_text = 'Кажется, вы искали эти игры.\n\n' + '\n\n'.join(games_texts)

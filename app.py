@@ -75,7 +75,7 @@ def game_info(name):
     return None
 
 def game_text(game):
-  text = f'''[{game.name}](https://rawg.io/games/{game.slug})
+  text = f'''[🎮 {game.name}](https://rawg.io/games/{game.slug})
 Дата релиза: {datetime.datetime.strptime(game.released, '%Y-%m-%d').strftime("%d.%m.%Y")}'''
   if game.metacritic != '':
     text = text + f'\nРейтинг Metacritic: [{game.metacritic}]({game.metacritic_url})'
@@ -95,7 +95,7 @@ def game_text(game):
     stores = []
     for store in game.stores:
       stores.append(f'[{store.name}]({store.url})')
-    stores_text = ' • '.join(stores)
+    stores_text = '🛒 ' + ' • '.join(stores)
     text = '\n'.join([text, stores_text])
   return text
 

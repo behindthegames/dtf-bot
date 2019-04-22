@@ -122,7 +122,8 @@ def deal_with_comment(payload):
           slugs.add(game.slug)
     (reply_id, reply_text) = (None, None)
     if len(games_texts) > 0 and post_id == 47384:
-      reply_text = 'Кажется, вы искали эти игры.\n\n' + '\n⁣\n⁣\n'.join(games_texts)
+      reply_text = '\n⁣\n⁣\n'.join(games_texts)
+      reply_text = reply_text + '\n\n' + f'Если бот не угадал с игрой — ставьте минус, мы разберемся.'
       (reply_id, reply_text) = send_a_comment(post_id = post_id, comment_id = comment_id, reply_text = reply_text)
     c.execute('insert into received (created_at, post_id, comment_id, comment_text, comment_author, games_names, payload, reply_id, reply_text) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', (datetime.datetime.now(), post_id, comment_id, comment_text, comment_author, '❧'.join(games_names), json.dumps(payload), reply_id, reply_text))
     conn.commit()

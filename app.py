@@ -18,6 +18,8 @@ app = Flask(__name__)
 X_DEVICE_TOKEN = os.environ['X_DEVICE_TOKEN']
 X_DEVICE_POSSESSION_TOKEN = os.environ['X_DEVICE_POSSESSION_TOKEN']
 
+store_order = {'steam': 0, 'playstation-store': 1, 'xbox-store': 2, 'apple-appstore': 3, 'gog': 4, 'nintendo': 5, 'xbox360': 6, 'google-play': 7, 'itch': 8, 'epic-games': 9, 'discord': 10}
+
 conn = None
 c = None
 def init():
@@ -92,7 +94,7 @@ def game_text(game):
     text = text + f'\nИздател{ "и" if len(pubs)>1 else "ь"}: {publishers_text}'
   if len(game.stores) > 0:
     stores = []
-    for store in game.stores:
+    for store in sorted(game.stores, key=lambda store: store_order[store.slug]):
       stores.append(f'[{store.name}]({store.url})')
     stores_text = '\n🛒 ' + ' • '.join(stores)
     text = '\n'.join([text, stores_text])

@@ -110,8 +110,8 @@ def deal_with_comment(payload):
     comment_author = payload['data']['creator']['id']
     if comment_author == 128204:
       return('OK')
-    if post_id == 47384:
-      print(f'payload: {payload}')
+    # if post_id == 47384:
+    #   print(f'payload: {payload}')
     games_texts = []
     games_names = get_game_names_from_text(comment_text)
     slugs = set()
@@ -128,7 +128,7 @@ def deal_with_comment(payload):
     c.execute('insert into received (created_at, post_id, comment_id, comment_text, comment_author, games_names, payload, reply_id, reply_text) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', (datetime.datetime.now(), post_id, comment_id, comment_text, comment_author, '❧'.join(games_names), json.dumps(payload), reply_id, reply_text))
     conn.commit()
   except Exception as e:
-    print(e)
+    print(f'{post_id}:{comment_id} : {e}')
   return('OK')
 
 @app.route("/comment_webhook", methods=['POST'])

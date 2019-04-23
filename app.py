@@ -114,6 +114,7 @@ def deal_with_comment(payload):
     #   print(f'payload: {payload}')
     games_texts = []
     games_names = get_game_names_from_text(comment_text)
+    results_count = 0
     slugs = set()
     for game_name in games_names:
       game = game_info(game_name)
@@ -121,6 +122,9 @@ def deal_with_comment(payload):
         if game.slug not in slugs:
           games_texts.append(game_text(game))
           slugs.add(game.slug)
+          results_count = results_count + 1
+          if results_count == 5:
+            break
     (reply_id, reply_text) = (None, None)
     if len(games_texts) > 0:
       reply_text = '\n⁣\n⁣\n'.join(games_texts)

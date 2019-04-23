@@ -114,7 +114,6 @@ def deal_with_comment(payload):
       print(f'payload: {payload}')
     games_texts = []
     games_names = get_game_names_from_text(comment_text)
-    print(f'games_names: {games_names}')
     slugs = set()
     for game_name in games_names:
       game = game_info(game_name)

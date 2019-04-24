@@ -10,6 +10,6 @@ It uses [public DTF.ru API](https://www.notion.so/API-TJ-vc-ru-DTF-3f5162d2cb184
 
 Disclamer: 
 1. I am not a professional software developer;
-2. this code was not reviewed by one
-3. This is a weekend project. 
-4. Here be the dragons.
+2. this code was not reviewed by one;
+3. this is a weekend project;
+4. here be the dragons.

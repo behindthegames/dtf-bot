@@ -117,7 +117,7 @@ def deal_with_comment(payload):
     results_count = 0
     slugs = set()
     for game_name in games_names:
-      if not re.match('\d{1,2}$', game_name):
+      if re.match('\d{1,2}$', game_name):
         continue
       game = game_info(game_name)
       if game is not None:

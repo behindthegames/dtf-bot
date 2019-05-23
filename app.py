@@ -78,7 +78,7 @@ def game_info(name):
 def game_text(game):
   text = f'🎮 [{game.name}](https://rawg.io/games/{game.slug})'
   if game.released != '':
-    text = text + f'\nДата релиза: {datetime.datetime.strptime(game.released, '%Y-%m-%d').strftime("%d.%m.%Y")}'
+    text = text + f'\nДата релиза: {datetime.datetime.strptime(game.released, "%Y-%m-%d").strftime("%d.%m.%Y")}'
   if game.metacritic != '':
     text = text + f'\nРейтинг Metacritic: [{game.metacritic}]({game.metacritic_url})'
   if len(game.developers) > 0:

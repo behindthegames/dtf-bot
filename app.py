@@ -72,9 +72,10 @@ def game_info(name):
     game.populate()
     if fuzz.partial_ratio(game.name.lower(), name.lower()) > 70:
         return game
-    for alt_name in game.alternative_names:
-        if fuzz.partial_ratio(alt_name.lower(), name.lower()) > 70:
-            return game
+    if hasattr(game, 'alternative_names'):
+        for alt_name in game.alternative_names:
+            if fuzz.partial_ratio(alt_name.lower(), name.lower()) > 70:
+                return game
 
 
 def game_text(game):
@@ -148,4 +149,9 @@ def comment_webhook():
     payload = request.get_json()
     if payload:
         executor.submit(execute, payload)
+    return 'OK'
+
+
+@app.route('/', methods=['GET'])
+def main():
     return 'OK'

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 from flask import Flask
 from flask import request
@@ -17,129 +16,151 @@ app = Flask(__name__)
 
 X_DEVICE_TOKEN = os.environ['X_DEVICE_TOKEN']
 X_DEVICE_POSSESSION_TOKEN = os.environ['X_DEVICE_POSSESSION_TOKEN']
+URL_SECRET = os.environ['URL_SECRET']
 
-store_order = {'steam': 0, 'playstation-store': 1, 'xbox-store': 2, 'apple-appstore': 3, 'gog': 4, 'nintendo': 5, 'xbox360': 6, 'google-play': 7, 'itch': 8, 'epic-games': 9, 'discord': 10}
+store_order = {'steam': 0, 'playstation-store': 1, 'xbox-store': 2, 'apple-appstore': 3, 'gog': 4, 'nintendo': 5,
+               'xbox360': 6, 'google-play': 7, 'itch': 8, 'epic-games': 9, 'discord': 10}
 
 conn = None
 c = None
+
+
 def init():
-  global conn
-  global c
-  conn = sqlite3.connect('logs.sqlite')
-  c = conn.cursor()
+    global conn
+    global c
+    conn = sqlite3.connect('logs.sqlite')
+    c = conn.cursor()
+
+
 executor = concurrent.futures.ProcessPoolExecutor(initializer=init)
 
+
 def send_a_comment(post_id, comment_id, reply_text):
-  try:
-      response = requests.post(
-          url="https://api.dtf.ru/v1.6/comment/add",
-          headers={
-              "X-Device-Token": X_DEVICE_TOKEN,
-              "X-Device-Possession-Token": X_DEVICE_POSSESSION_TOKEN,
-              "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-          },
-          data={
-              "id": post_id,
-              "reply_to": comment_id,
-              "text": reply_text,
-          },
-      )
-      return (response.json()['result']['id'], response.json()['result']['text'])
-      print('Response HTTP Status Code: {status_code}'.format(
-          status_code=response.status_code))
-      print('Response HTTP Response Body: {content}'.format(
-          content=response.content))
-  except requests.exceptions.RequestException as e:
-    return f'Exception trying to post a reply {e}'
+    try:
+        response = requests.post(
+            url="https://api.dtf.ru/v1.6/comment/add",
+            headers={
+                "X-Device-Token": X_DEVICE_TOKEN,
+                "X-Device-Possession-Token": X_DEVICE_POSSESSION_TOKEN,
+                "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+            },
+            data={
+                "id": post_id,
+                "reply_to": comment_id,
+                "text": reply_text,
+            },
+        )
+        return (response.json()['result']['id'], response.json()['result']['text'])
+    except requests.exceptions.RequestException as e:
+        return f'Exception trying to post a reply {e}'
+
 
 def get_game_names_from_text(text):
-  md_links = re.compile('\[[^\[\]]+\]\([^\(\)]+\)')
-  text = md_links.sub('', text)
-  matches = re.findall('(\[[^\[\]]+\]|\{[^\{\}]+\})', text)
-  for i, m in enumerate(matches):
-    matches[i] = m.strip('[]{}')
-  return matches
+    md_links = re.compile(r'\[[^\[\]]+\]\([^\(\)]+\)')
+    text = md_links.sub('', text)
+    matches = re.findall(r'(\[[^\[\]]+\]|\{[^\{\}]+\})', text)
+    for i, m in enumerate(matches):
+        matches[i] = m.strip('[]{}')
+    return matches
+
 
 def game_info(name):
-  rawg = rawgpy.RAWG('dtf-bot')
-  res = rawg.search(name, num_results=1)
-  if res.count == 0:
-    return None
-  game = res[0]
-  game.populate()
-  if fuzz.partial_ratio(game.name.lower(), name.lower()) > 70:
-    return game
-  for alt_name in game.alternative_names:
-    if fuzz.partial_ratio(alt_name.lower(), name.lower()) > 70:
-      return game
-  else:
-    return None
+    rawg = rawgpy.RAWG('dtf-bot')
+    res = rawg.search(name, num_results=1)
+    if res.count == 0:
+        return None
+    game = res[0]
+    game.populate()
+    if fuzz.partial_ratio(game.name.lower(), name.lower()) > 70:
+        return game
+    for alt_name in game.alternative_names:
+        if fuzz.partial_ratio(alt_name.lower(), name.lower()) > 70:
+            return game
+    else:
+        return None
+
 
 def game_text(game):
-  text = f'🎮 [{game.name}](https://rawg.io/games/{game.slug})'
-  if game.released != '':
-    text = text + f'\nДата релиза: {datetime.datetime.strptime(game.released, "%Y-%m-%d").strftime("%d.%m.%Y")}'
-  if game.metacritic != '':
-    text = text + f'\nРейтинг Metacritic: [{game.metacritic}]({game.metacritic_url})'
-  if len(game.developers) > 0:
-    devs = []
-    for dev in game.developers:
-      devs.append(f'{dev.name}')
-    developers_text = ', '.join(devs)
-    text = text + f'\n\nРазработчик{ "и" if len(devs)>1 else ""}: {developers_text}'
-  if len(game.publishers) > 0:
-    pubs = []
-    for pub in game.publishers:
-      pubs.append(f'{pub.name}')
-    publishers_text = ', '.join(pubs)
-    text = text + f'\nИздател{ "и" if len(pubs)>1 else "ь"}: {publishers_text}'
-  if len(game.stores) > 0:
-    stores = []
-    for store in sorted(game.stores, key=lambda store: store_order[store.slug]):
-      stores.append(f'[{store.name}]({store.url})')
-    stores_text = '\n🛒 ' + ' • '.join(stores)
-    text = '\n'.join([text, stores_text])
-  return text
+    text = f'🎮 [{game.name}](https://rawg.io/games/{game.slug})'
+    try:
+        if game.released != '':
+            text = text + f'\nДата релиза: {datetime.datetime.strptime(game.released, "%Y-%m-%d").strftime("%d.%m.%Y")}'
+    except AttributeError:
+        pass
+    try:
+        if game.metacritic != '':
+            text = text + f'\nРейтинг Metacritic: [{game.metacritic}]({game.metacritic_url})'
+    except AttributeError:
+        pass
+    if len(game.developers) > 0:
+        devs = []
+        for dev in game.developers:
+            devs.append(f'{dev.name}')
+        developers_text = ', '.join(devs)
+        text = text + f'\n\nРазработчик{"и" if len(devs) > 1 else ""}: {developers_text}'
+    if len(game.publishers) > 0:
+        pubs = []
+        for pub in game.publishers:
+            pubs.append(f'{pub.name}')
+        publishers_text = ', '.join(pubs)
+        text = text + f'\nИздател{"и" if len(pubs) > 1 else "ь"}: {publishers_text}'
+    if len(game.stores) > 0:
+        stores = []
+        for store in sorted(game.stores, key=lambda store: store_order[store.slug]):
+            stores.append(f'[{store.name}]({store.url})')
+        stores_text = '\n🛒 ' + ' • '.join(stores)
+        text = '\n'.join([text, stores_text])
+    return text
+
 
 def deal_with_comment(payload):
-  try:
-    if payload['type'] != 'new_comment':
-      raise Exception(f'unexpected webhook payload type = {data["type"]}, expected new_comment')
-    post_id = payload['data']['content']['id']
-    comment_id = payload['data']['id']
-    comment_text = payload['data']['text']
-    comment_author = payload['data']['creator']['id']
-    if comment_author == 128204:
-      return('OK')
-    # if post_id == 47384:
-    #   print(f'payload: {payload}')
-    games_texts = []
-    games_names = get_game_names_from_text(comment_text)
-    results_count = 0
-    slugs = set()
-    for game_name in games_names:
-      if re.match('\d{1,2}$', game_name):
-        continue
-      game = game_info(game_name)
-      if game is not None:
-        if game.slug not in slugs:
-          games_texts.append(game_text(game))
-          slugs.add(game.slug)
-          results_count = results_count + 1
-          if results_count == 5:
-            break
-    (reply_id, reply_text) = (None, None)
-    if len(games_texts) > 0:
-      reply_text = '\n\n———\n\n'.join(games_texts)
-      (reply_id, reply_text) = send_a_comment(post_id = post_id, comment_id = comment_id, reply_text = reply_text)
-    c.execute('insert into received (created_at, post_id, comment_id, comment_text, comment_author, games_names, payload, reply_id, reply_text) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', (datetime.datetime.now(), post_id, comment_id, comment_text, comment_author, '❧'.join(games_names), json.dumps(payload), reply_id, reply_text))
-    conn.commit()
-  except Exception as e:
-    print(f'{post_id}:{comment_id} : {e}')
-  return('OK')
+    post_id = ''
+    comment_id = ''
+    try:
+        if payload['type'] != 'new_comment':
+            raise Exception(f'unexpected webhook payload type = {payload["type"]}, expected new_comment')
+        post_id = payload['data']['content']['id']
+        comment_id = payload['data']['id']
+        comment_text = payload['data']['text']
+        comment_author = payload['data']['creator']['id']
+        if comment_author == 128204:
+            return 'OK'
+        games_texts = []
+        games_names = get_game_names_from_text(comment_text)
+        results_count = 0
+        slugs = set()
+        for game_name in games_names:
+            if re.match(r'\d{1,2}$', game_name):
+                continue
+            game = game_info(game_name)
+            if game is not None:
+                if game.slug not in slugs:
+                    games_texts.append(game_text(game))
+                    slugs.add(game.slug)
+                    results_count = results_count + 1
+                    if results_count == 5:
+                        break
+        (reply_id, reply_text) = (None, None)
+        if len(games_texts) > 0:
+            reply_text = '\n\n———\n\n'.join(games_texts)
+            (reply_id, reply_text) = send_a_comment(post_id=post_id, comment_id=comment_id, reply_text=reply_text)
+        c.execute(
+            'insert into received '
+            '(created_at, post_id, comment_id, comment_text, comment_author, games_names, payload, reply_id, '
+            'reply_text) values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            (datetime.datetime.now(), post_id, comment_id, comment_text, comment_author, '❧'.join(games_names),
+             json.dumps(payload), reply_id, reply_text)
+        )
+        conn.commit()
+    except Exception as e:
+        print(f'{post_id}:{comment_id} : {e}')
+    return 'OK'
+
 
 @app.route("/comment_webhook", methods=['POST'])
 def comment_webhook():
-  payload = request.get_json()
-  executor.submit(deal_with_comment, payload)
-  return('OK')
+    if request.args.get('sercret') != URL_SECRET:
+        return 'NOTOK'
+    payload = request.get_json()
+    executor.submit(deal_with_comment, payload)
+    return 'OK'

@@ -12,8 +12,8 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 X_DEVICE_TOKEN = os.environ['X_DEVICE_TOKEN']
 X_DEVICE_POSSESSION_TOKEN = os.environ['X_DEVICE_POSSESSION_TOKEN']
 URL_SECRET = os.environ['URL_SECRET']
+BOT_ID = os.environ['BOT_ID']
 SENTRY_URL = os.environ.get('SENTRY_URL')
-BOT_ID = os.environ.get('BOT_ID')
 
 if SENTRY_URL:
     sentry_sdk.init(dsn=SENTRY_URL, integrations=[FlaskIntegration()])

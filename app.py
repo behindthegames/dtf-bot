@@ -2,6 +2,8 @@ import concurrent.futures
 import datetime
 import os
 import re
+from time import sleep
+
 import rawgpy
 import requests
 import sentry_sdk
@@ -14,6 +16,9 @@ X_DEVICE_POSSESSION_TOKEN = os.environ['X_DEVICE_POSSESSION_TOKEN']
 URL_SECRET = os.environ['URL_SECRET']
 BOT_ID = os.environ['BOT_ID']
 SENTRY_URL = os.environ.get('SENTRY_URL')
+MAX_RESULTS = 5
+RETRIES = 3
+RETRY_TIMEOUT = 3
 
 if SENTRY_URL:
     sentry_sdk.init(dsn=SENTRY_URL, integrations=[FlaskIntegration()])
@@ -63,9 +68,16 @@ def get_game_names_from_text(text):
     return matches
 
 
-def game_info(name):
+def game_info(name, retry=RETRIES):
     rawg = rawgpy.RAWG('dtf-bot')
-    res = rawg.search(name, num_results=1)
+    try:
+        res = rawg.search(name, num_results=1)
+    except:
+        if not retry:
+            raise
+        retry -= 1
+        sleep(RETRY_TIMEOUT * (RETRIES - retry))
+        return game_info(name, retry=retry)
     if not res:
         return
     game = res[0]
@@ -98,7 +110,7 @@ def game_text(game):
         text = text + f'\nИздател{"и" if len(pubs) > 1 else "ь"}: {publishers_text}'
     if hasattr(game, 'stores') and game.stores:
         stores = []
-        for store in sorted(game.stores, key=lambda s: stores_order.get(s.slug) or 1000):
+        for store in sorted(game.stores, key=lambda s: stores_order.get(s.slug) or len(stores_order)):
             stores.append(f'[{store.name}]({store.url})')
         stores_text = '\n🛒 ' + ' • '.join(stores)
         text = '\n'.join([text, stores_text])
@@ -126,7 +138,7 @@ def deal_with_comment(payload):
             continue
         games_texts.append(game_text(game))
         slugs.add(game.slug)
-        if len(slugs) == 5:
+        if len(slugs) == MAX_RESULTS:
             break
     if games_texts:
         reply_text = '\n\n———\n\n'.join(games_texts)

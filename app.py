@@ -17,8 +17,8 @@ URL_SECRET = os.environ['URL_SECRET']
 BOT_ID = os.environ['BOT_ID']
 SENTRY_URL = os.environ.get('SENTRY_URL')
 MAX_RESULTS = 5
-RETRIES = 3
-RETRY_TIMEOUT = 3
+RETRIES = 10
+RETRY_TIMEOUT = 5
 
 if SENTRY_URL:
     sentry_sdk.init(dsn=SENTRY_URL, integrations=[FlaskIntegration()])

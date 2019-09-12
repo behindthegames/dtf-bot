@@ -128,8 +128,11 @@ def deal_with_comment(payload):
     games_texts = []
     slugs = set()
     for game_name in get_game_names_from_text(comment_text):
+        # skip [1], [23], etc.
         if len(game_name) < 3 and game_name.isdigit():
-            # skip [1], [23], etc.
+            continue
+        # skip [@1234|name]
+        if game_name[0] == '@':
             continue
         game = game_info(game_name)
         if not game:

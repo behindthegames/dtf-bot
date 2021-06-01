@@ -11,6 +11,6 @@ MarkupSafe==1.1.1
 python-Levenshtein==0.12.0
 rawgpy==1.0.1
 requests==2.21.0
-urllib3==1.24.2
+urllib3==1.26.5
 Werkzeug==0.15.3
 sentry-sdk[flask]==0.10.2
